@@ -1,0 +1,6 @@
+venv/
+sbobet/
+airflow/config/
+airflow/dags/tmp/
+airflow/logs/
+airflow/plugins/
