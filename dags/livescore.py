@@ -1,14 +1,13 @@
 import requests, json
 from datetime import datetime
-from dotenv import dotenv_values
 from cosine import the_nearest
+from utils import *
 
 # --- init base ---
-url = 'https://www.livescore.com/_next/data/LbC2S31VjzszcKPHb0uaY/en/football/{cmnt}/{scd}/{t1}-vs-{t2}/{eid}.json'
+build_id = read_json('./tmp/build_id.json')
+url = 'https://www.livescore.com/_next/data/{build_id}/en/football/{cmnt}/{scd}/{t1}-vs-{t2}/{eid}.json'
 url_live = 'https://prod-public-api.livescore.com/v1/api/app/live/soccer/7?locale=en&MD=1'
-# url_live = 'https://prod-public-api.livescore.com/v1/api/app/stage/soccer/euro-2024/semi-finals/7?locale=en&MD=1'
-date = datetime.now().strftime('%Y%m%d')
-configs = dotenv_values('.env')
+# url_live = 'https://prod-public-api.livescore.com/v1/api/app/stage/soccer/usa/major-league-soccer/7?locale=en&MD=1'
 # pageProps
 DATA = {
     'tournament': 'categoryName',
@@ -41,9 +40,9 @@ def get_stage(match_target):
             eid = game['Eid']
             t1 = game['T1'][0]['Nm'].lower().replace(' ', '-').replace('/', '_').replace("'", '')
             t2 = game['T2'][0]['Nm'].lower().replace(' ', '-').replace('/', '_').replace("'", '')
-            datas[f'{cnm}-{t1}-{t2}'] = url.format(cmnt=cmnt, scd=scd, t1=t1, t2=t2, eid=eid)
-    value, target_best, score = the_nearest(datas, match_target)
-    return value
+            datas[f'{cnm}-{t1}-{t2}'] = url.format(build_id=build_id['build_id'], cmnt=cmnt, scd=scd, t1=t1, t2=t2, eid=eid)
+    # value, target_best, score = the_nearest(datas, match_target)
+    return the_nearest(datas, match_target)
 
 def get_score(url='https://www.livescore.com/_next/data/LbC2S31VjzszcKPHb0uaY/en/football/euro-2024/semi-finals/spain-vs-france/1274137.json'):
     data = {}
@@ -51,8 +50,11 @@ def get_score(url='https://www.livescore.com/_next/data/LbC2S31VjzszcKPHb0uaY/en
     data_json = response.json()['pageProps']['initialEventData']['event']
     for key, value in DATA.items():
         data[key] = _collect_data(data_json, value)
-    data['period'] = len(data['period'].keys())
-    print(data['period'])
+    try:
+        data['period'] = len(data['period'])
+    except:
+        data['period'] = 1
+    # print(data['period'])
     temp_score = {}
     if data['period']==1:
         temp_score['home_team'] = int(_collect_data(data_json, 'scores.homeTeamScore'))
@@ -65,23 +67,24 @@ def get_score(url='https://www.livescore.com/_next/data/LbC2S31VjzszcKPHb0uaY/en
         temp_score['away_team'] = int(_collect_data(ht_score, 'away.score'))
         data['firsthalf_score'] = temp_score
         
-        temp_score['home_team'] = int(_collect_data(data_json, 'scores.homeTeamScore'))
-        temp_score['away_team'] = int(_collect_data(data_json, 'scores.awayTeamScore'))
-        data['fulltime_score'] = temp_score
+    temp_score['home_team'] = int(_collect_data(data_json, 'scores.homeTeamScore'))
+    temp_score['away_team'] = int(_collect_data(data_json, 'scores.awayTeamScore'))
+    data['fulltime_score'] = temp_score
         
     return data
 
-def crawl():
-    with open('/opt/airflow/dags/tmp/kingbets.json', 'r', encoding='utf-8') as f:
-        bets = json.load(f)
+def fetch_livescore_data():
+    bets = read_json('./tmp/kingbets.json')
+    write_log(f'[LIVESCORE]')
     datas = []
     for bet in bets:
         match_target = f"{bet['tournament']}-{bet['home_team']}-{bet['away_team']}"
-        url = get_stage(match_target)
-        data = get_score(url)
-        datas.append(data)
-    with open('/opt/airflow/dags/tmp/livescore.json', 'w', encoding='utf-8') as f:
-        json.dump(datas, f, ensure_ascii=False, indent=4)
+        url, target_best, score = get_stage(match_target)
+        if score > 0.3:
+            data = get_score(url)
+            datas.append(data)
+            write_log(f'\t+ {match_target} > {target_best}: {score}')
+    write_json(datas, './tmp/livescore.json')
 
 if __name__ == '__main__':
-    crawl()
+    fetch_livescore_data()

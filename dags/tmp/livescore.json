@@ -1,0 +1,30 @@
+[
+    {
+        "tournament": "Brazil",
+        "home_team": "Atletico GO",
+        "away_team": "Bahia",
+        "period": 2,
+        "firsthalf_score": {
+            "home_team": 1,
+            "away_team": 0
+        },
+        "fulltime_score": {
+            "home_team": 1,
+            "away_team": 0
+        }
+    },
+    {
+        "tournament": "Brazil",
+        "home_team": "Amazonas FC",
+        "away_team": "Guarani",
+        "period": 1,
+        "firsthalf_score": {
+            "home_team": 1,
+            "away_team": 1
+        },
+        "fulltime_score": {
+            "home_team": 1,
+            "away_team": 1
+        }
+    }
+]

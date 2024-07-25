@@ -1,0 +1,42 @@
+[
+    {
+        "id": 11820,
+        "sport": "SOCCER",
+        "tournament": "Brazil Serie A",
+        "game_id": "7024109",
+        "game": "Atletico Goianiense / Bahia",
+        "home_team": "Atletico Goianiense",
+        "away_team": "Bahia",
+        "date_event": "2024-07-24T20:30:00.1000000",
+        "status": 0,
+        "period": 2,
+        "firsthalf_score": {
+            "home_team": 0,
+            "away_team": 0
+        },
+        "fulltime_score": {
+            "home_team": 1,
+            "away_team": 0
+        }
+    },
+    {
+        "id": 11821,
+        "sport": "SOCCER",
+        "tournament": "Brazil Serie B",
+        "game_id": "7004040",
+        "game": "Amazonas FC / Guarani SP",
+        "home_team": "Amazonas FC",
+        "away_team": "Guarani SP",
+        "date_event": "2024-07-24T20:30:00.1000000",
+        "status": 0,
+        "period": 2,
+        "firsthalf_score": {
+            "home_team": 1,
+            "away_team": 1
+        },
+        "fulltime_score": {
+            "home_team": 1,
+            "away_team": 1
+        }
+    }
+]

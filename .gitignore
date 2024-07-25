@@ -1,6 +1,3 @@
-venv/
-sbobet/
-airflow/config/
-airflow/dags/tmp/
-airflow/logs/
-airflow/plugins/
+dags/__pycache__/
+dags/logs/
+!dags/tmp/build_id.json
